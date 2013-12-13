@@ -1,4 +1,5 @@
 ---
+# postgresql management
 - name: create revisioneer database
   sudo_user: postgres
   postgresql_db:
@@ -16,6 +17,7 @@
     password: "{{ db_password }}"
     priv: ALL
 
+# user management
 - name: create revisioneer user
   user:
     name: "{{ user }}"
@@ -24,6 +26,7 @@
     shell: "/bin/bash"
     state: present
 
+# golang installation using godeb utility
 - name: download godeb
   sudo_user: "{{ user }}"
   get_url:
