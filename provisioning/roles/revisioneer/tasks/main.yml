@@ -1,0 +1,50 @@
+---
+- name: create revisioneer database
+  sudo_user: postgres
+  postgresql_db:
+    name: "{{ db }}"
+    encoding: 'UTF-8'
+    lc_collate: 'en_US.UTF-8'
+    lc_ctype: 'en_US.UTF-8'
+    template: 'template0'
+
+- name: create revisioneer db user
+  sudo_user: postgres
+  postgresql_user:
+    db: "{{ db }}"
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    priv: ALL
+
+- name: create revisioneer user
+  user:
+    name: "{{ user }}"
+    home: "{{ home_directory }}"
+    createhome: yes
+    shell: "/bin/bash"
+    state: present
+
+- name: download godeb
+  sudo_user: "{{ user }}"
+  get_url:
+    url: "https://godeb.s3.amazonaws.com/godeb-amd64.tar.gz"
+    dest: "{{ home_directory }}/godeb.tar.gz"
+
+- name: check if godeb was unzipped
+  shell: "ls -al {{ home_directory }}/godeb; true"
+  register: "godeb_exists"
+
+- name: unzip godeb
+  sudo_user: "{{ user }}"
+  shell: "tar -C {{ home_directory }} -zxvf {{ home_directory }}/godeb.tar.gz"
+  when: "'{{ godeb_exists.stdout }}' == ''"
+
+- name: check if go was installed
+  shell: executable=/bin/bash which go; true
+  register: "go_exists"
+
+- name: install golang 1.2
+  shell: "{{ home_directory }}/godeb install"
+  when: "'{{ go_exists.stdout }}' == ''"
+
+# - name: install perl, sqitch

@@ -1,0 +1,7 @@
+---
+- hosts: revisioneer
+  sudo: true
+  roles:
+    - database
+    - webserver
+    - revisioneer

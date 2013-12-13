@@ -1,0 +1,5 @@
+db: "revisioneer"
+db_user: "revisioneer"
+db_password: "nopass"
+user: "revisioneer"
+home_directory: "/home/{{ user }}"

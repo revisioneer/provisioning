@@ -1,0 +1,17 @@
+---
+- name: update apt cache
+  apt: update-cache=yes
+
+- name: install common dependencies
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - python
+    - python-psycopg2
+    - python-software-properties
+    - g++
+    - build-essential
+    - make
+    - vim
+    - htop
+    - git-core
+    - libpq-dev
