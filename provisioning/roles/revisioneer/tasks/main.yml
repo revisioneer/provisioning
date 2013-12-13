@@ -32,22 +32,19 @@
   get_url:
     url: "https://godeb.s3.amazonaws.com/godeb-amd64.tar.gz"
     dest: "{{ home_directory }}/godeb.tar.gz"
-
-- name: check if godeb was unzipped
-  shell: "ls -al {{ home_directory }}/godeb; true"
-  register: "godeb_exists"
+  register: godeb_download
 
 - name: unzip godeb
   sudo_user: "{{ user }}"
   shell: "tar -C {{ home_directory }} -zxvf {{ home_directory }}/godeb.tar.gz"
-  when: "'{{ godeb_exists.stdout }}' == ''"
+  when: "godeb_download.changed"
 
 - name: check if go was installed
   shell: executable=/bin/bash which go; true
-  register: "go_exists"
+  register: "go_is_installed"
 
 - name: install golang 1.2
   shell: "{{ home_directory }}/godeb install"
-  when: "'{{ go_exists.stdout }}' == ''"
+  when: "go_is_installed is defined and go_is_installed.stdout == ''"
 
 # - name: install perl, sqitch
