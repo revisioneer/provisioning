@@ -53,7 +53,7 @@
     key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
     manage_dir: no
 
-# perl installation
+# sqitch installation
 - name: install perl
   apt: pkg={{ item }} state=installed update-cache=yes
   with_items:
@@ -78,4 +78,3 @@
 
 - shell: "unzip /usr/local/perl/sqitch.zip -d /usr/local/perl"
 - shell: "cd /usr/local/perl/sqitch-* && dzil install"
-  tags: try
