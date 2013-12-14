@@ -87,3 +87,5 @@
 - apt: pkg={{ item }} state=installed
   with_items:
     - supervisor
+
+- template: src=supervisor/revisions.js dest=/etc/supervisor/conf.d/revisions.conf owner=root group=root mode=0600
