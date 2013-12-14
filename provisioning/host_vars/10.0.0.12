@@ -5,3 +5,5 @@ user: "revisioneer"
 home_directory: "/home/{{ user }}"
 domains: "revisions.deployed.eu revisions.nicolai86.eu"
 use_ssl: False
+ssl_cert:
+ssl_key:
