@@ -1,1 +1,8 @@
 ---
+- apt: pkg={{ item }} state=installed
+  with_items:
+    - nginx
+
+- template: src=nginx/revisioneer.js dest=/etc/nginx/sites-available/revisioneer owner=root group=root mode=0600
+
+- file: src=/etc/nginx/sites-available/revisioneer path=/etc/nginx/sites-enabled/revisioneer state=link

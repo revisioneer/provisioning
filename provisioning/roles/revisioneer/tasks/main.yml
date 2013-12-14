@@ -75,6 +75,15 @@
 - get_url:
     url: "https://github.com/theory/sqitch/archive/v0.983.zip"
     dest: "/usr/local/perl/sqitch.zip"
+  register: download_sqitch
 
 - shell: "unzip /usr/local/perl/sqitch.zip -d /usr/local/perl"
+  when: download_sqitch.changed
+
 - shell: "cd /usr/local/perl/sqitch-* && dzil install"
+  when: download_sqitch.changed
+
+# supervisor
+- apt: pkg={{ item }} state=installed
+  with_items:
+    - supervisor

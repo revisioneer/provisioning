@@ -2,6 +2,9 @@
 - hosts: revisioneer
   sudo: true
   roles:
-    - database
-    - webserver
-    - revisioneer
+    -
+      role: database
+    -
+      role: webserver
+    -
+      role: revisioneer

@@ -3,3 +3,5 @@ db_user: "revisioneer"
 db_password: "nopass"
 user: "revisioneer"
 home_directory: "/home/{{ user }}"
+domains: "revisions.deployed.eu revisions.nicolai86.eu"
+use_ssl: False
