@@ -47,4 +47,35 @@
   shell: "{{ home_directory }}/godeb install"
   when: "go_is_installed is defined and go_is_installed.stdout == ''"
 
-# - name: install perl, sqitch
+# ssh authorized key
+- authorized_key:
+    user: "{{ user }}"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    manage_dir: no
+
+# perl installation
+- name: install perl
+  apt: pkg={{ item }} state=installed update-cache=yes
+  with_items:
+    - perl
+    - curl
+    - cpanminus
+    - gettext
+
+- name: install Dist::Zilla
+  cpanm: name="{{ item }}"
+  with_items:
+    - Dist::Zilla
+    - Dist::Zilla::Plugin::CheckExtraTests
+    - Dist::Zilla::Plugin::LocaleTextDomain
+    - Dist::Zilla::Plugin::VersionFromModule
+
+- file: path=/usr/local/perl owner=root group=root mode=655 recurse=yes state=directory
+
+- get_url:
+    url: "https://github.com/theory/sqitch/archive/v0.983.zip"
+    dest: "/usr/local/perl/sqitch.zip"
+
+- shell: "unzip /usr/local/perl/sqitch.zip -d /usr/local/perl"
+- shell: "cd /usr/local/perl/sqitch-* && dzil install"
+  tags: try
