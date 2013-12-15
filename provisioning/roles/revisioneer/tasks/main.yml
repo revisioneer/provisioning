@@ -77,11 +77,15 @@
     dest: "/usr/local/perl/sqitch.zip"
   register: download_sqitch
 
+- stat: path=/usr/local/perl/sqitch-0.983
+  register: sqitch_extract_dir
+
 - shell: "unzip /usr/local/perl/sqitch.zip -d /usr/local/perl"
-  when: download_sqitch.changed
+  when: sqitch_extract_dir.stat.isdir is undefined or sqitch_extract_dir.stat.isdir == false
+  register: sqitch_unzip
 
 - shell: "cd /usr/local/perl/sqitch-* && dzil install"
-  when: download_sqitch.changed
+  when: sqitch_unzip.changed
 
 # supervisor
 - apt: pkg={{ item }} state=installed
