@@ -3,9 +3,8 @@ server {
   server_name {{ domains }};
 
 
-  {% if use_ssl %}
-  ssl_certificate   {{ ssl_cert }};
-  ssl_certificate_key   {{ ssl_key }};
+  {% if use_ssl %}ssl_certificate {{ ssl_path }}/{{ ssl_cert }};
+  ssl_certificate_key {{ ssl_path }}/{{ ssl_key }};
   ssl_protocols SSLv3 TLSv1.1 TLSv1.2;
   ssl_prefer_server_ciphers on;
 

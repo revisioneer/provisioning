@@ -1,6 +1,15 @@
 ---
 - name: install postgresql
-  apt: pkg=postgresql state=installed
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+  with_items:
+    - postgresql
+    - postgresql-common
+    - postgresql-client
+    - postgresql-client-common
 
 - name: start postgresql
-  service: name=postgresql state=started
+  service:
+    name: postgresql
+    state: started
