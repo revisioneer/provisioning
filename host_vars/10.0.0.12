@@ -1,9 +1,14 @@
-db: "revisioneer"
-db_user: "revisioneer"
-db_password: "nopass"
+database: "revisions"
+database_user: "revisions"
+database_host: localhost
+database_password: "nopass"
+
 user: "revisioneer"
+
 home_directory: "/home/{{ user }}"
 domains: "revisions.deployed.eu revisions.nicolai86.eu"
+
 use_ssl: False
+ssl_path:
 ssl_cert:
 ssl_key:

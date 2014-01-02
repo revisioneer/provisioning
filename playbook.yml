@@ -1,0 +1,49 @@
+---
+- hosts: revisioneer
+  sudo: true
+  tags: provision
+  roles:
+    -
+      role: database
+    -
+      role: webserver
+    -
+      role: revisioneer
+
+- hosts: revisioneer
+  remote_user: "{{ user }}"
+  tags: deploy
+  vars:
+    home_directory: "/home/{{ user }}"
+
+    repo: "git@github.com:nicolai86/revisioneer.git"
+    branch: "master"
+
+    deploy_to: "{{ home_directory }}"
+    build_path: "{{ deployment.build_path }}"
+    release_path: "{{ deploy_to }}/releases/{{ deployment.timestamp }}"
+    shared_path: "{{ deploy_to }}/shared"
+    current_path: "{{ deploy_to }}/current"
+
+    directories:
+      - "{{ deploy_to }}/releases"
+      - "{{ shared_path }}/log"
+      - "{{ shared_path }}/tmp"
+      - "{{ shared_path }}/vendor"
+
+    templates:
+      - { src: "templates/sqitch.conf.js", dest: "{{ shared_path }}/sqitch.conf" }
+
+    symlinks:
+      - { src: "{{ shared_path }}/sqitch.conf", dest: "{{ build_path }}/sqitch.conf" }
+      - { src: "{{ shared_path }}/vendor", dest: "{{ build_path }}/vendor" }
+
+  roles:
+    -
+      role: nicolai86.ansible-deployment-facts
+    -
+      role: deploy
+
+  tasks:
+    - name: restart revisioneer
+      shell: sudo supervisorctl restart revisions

@@ -1,0 +1,92 @@
+---
+- action: deployment_facts
+
+- name: add $GOPATH to PATH
+  lineinfile:
+    dest: "{{ home_directory }}/.bashrc"
+    insertafter: BOF
+    regexp: ^export.PATH=\$GOPATH
+    line: "export PATH=/usr/lib/go/bin:$GOPATH/bin:$PATH"
+    state: present
+
+- name: add GOPATH to .bashrc
+  lineinfile:
+    dest: "{{ home_directory }}/.bashrc"
+    insertafter: BOF
+    regexp: ^export.GOPATH
+    line: "export GOPATH=$HOME/go"
+    state: present
+
+- name: install gom
+  shell: go get github.com/mattn/gom
+
+- name: create shared directories
+  file:
+    path: "{{ item }}"
+    state: "directory"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: "0755"
+  with_items:
+    - $directories
+
+- name: create configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: "0600"
+  with_items: $templates
+
+- name: add git server public key to known hosts
+  shell: "ssh -o StrictHostKeyChecking=no github.com"
+  ignore_errors: yes
+
+- name: create or update the bare Git repository
+  git:
+    repo: "{{ repo }}"
+    dest: "{{ deploy_to }}/scm"
+    version: "{{ branch }}"
+    bare: "yes"
+    update: "yes"
+
+- name: clone the bare Git repository to destination
+  git:
+    repo: "{{ deploy_to }}/scm"
+    dest: "{{ build_path }}"
+    version: "{{ branch }}"
+    bare: "no"
+
+- name: symlink shared files
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: "link"
+    force: "yes"
+    recurse: "yes"
+  with_items: $symlinks
+
+- name: install dependencies
+  shell: "cd {{ build_path }} && gom install"
+
+- name: build binary
+  shell: "cd {{ build_path }} && gom build -o revisioneer"
+
+- name: migrate database
+  shell: "cd {{ build_path }} && sqitch deploy"
+  register: sqitch_result
+  failed_when: "'FATAL' in sqitch_result.stderr"
+
+- name: move build_path to release_path
+  shell: "mv {{ build_path }} {{ release_path }}"
+
+- name: update the current symlink
+  file:
+    src: "{{ release_path }}"
+    dest: "{{ current_path }}"
+    state: "link"
+    force: "yes"
+
+- name: cleanup old releases
+  shell: ls -dt {{ deploy_to }}/releases/* | tail -n +6 | xargs rm -fr

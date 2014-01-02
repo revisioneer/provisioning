@@ -7,4 +7,4 @@ stdout_logfile={{ home_directory }}/shared/log/out.log
 stderr_logfile={{ home_directory }}/shared/log/err.log
 user={{ user }}
 directory={{ home_directory }}/current
-environment=REV_DSN="user='{{ db_user }}' password='{{ db_password }}' dbname='{{ db }}' sslmode=disable",PORT="9500"
+environment=REV_DSN="user='{{ database_user }}' password='{{ database_password }}' dbname='{{ database }}' sslmode=disable",PORT="9500"

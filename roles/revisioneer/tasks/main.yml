@@ -3,7 +3,7 @@
 - name: create revisioneer database
   sudo_user: postgres
   postgresql_db:
-    name: "{{ db }}"
+    name: "{{ database }}"
     encoding: 'UTF-8'
     lc_collate: 'en_US.UTF-8'
     lc_ctype: 'en_US.UTF-8'
@@ -12,9 +12,9 @@
 - name: create revisioneer db user
   sudo_user: postgres
   postgresql_user:
-    db: "{{ db }}"
-    name: "{{ db_user }}"
-    password: "{{ db_password }}"
+    db: "{{ database }}"
+    name: "{{ database_user }}"
+    password: "{{ database_password }}"
     priv: ALL
 
 # user management
@@ -53,6 +53,12 @@
     key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
     manage_dir: no
 
+- file:
+    path: "{{ home_directory }}/.ssh"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0700
+
 # sqitch installation
 - name: install perl
   apt: pkg={{ item }} state=installed update-cache=yes
@@ -69,6 +75,7 @@
     - Dist::Zilla::Plugin::CheckExtraTests
     - Dist::Zilla::Plugin::LocaleTextDomain
     - Dist::Zilla::Plugin::VersionFromModule
+    - DBD::Pg
 
 - file: path=/usr/local/perl owner=root group=root mode=655 recurse=yes state=directory
 
@@ -77,7 +84,8 @@
     dest: "/usr/local/perl/sqitch.zip"
   register: download_sqitch
 
-- stat: path=/usr/local/perl/sqitch-0.983
+- stat:
+    path: /usr/local/perl/sqitch-0.983
   register: sqitch_extract_dir
 
 - shell: "unzip /usr/local/perl/sqitch.zip -d /usr/local/perl"
@@ -92,4 +100,24 @@
   with_items:
     - supervisor
 
-- template: src=supervisor/revisions.js dest=/etc/supervisor/conf.d/revisions.conf owner=root group=root mode=0600
+- template:
+    src: supervisor/revisions.js
+    dest: /etc/supervisor/conf.d/revisions.conf
+    owner: root
+    group: root
+    mode: 0600
+
+- service:
+    name: supervisor
+    state: started
+
+- name: allow sudo access to supervisorctl
+  lineinfile:
+    dest: "/etc/sudoers"
+    insertafter: EOF
+    regexp: "^{{ user }}"
+    line: "{{ user }} ALL=NOPASSWD: /usr/bin/supervisorctl"
+    state: present
+
+- name: ensure proper sudo permissions
+  shell: "chmod 4755 $(which sudo)"

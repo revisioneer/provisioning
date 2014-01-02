@@ -2,6 +2,7 @@ server {
   listen {% if use_ssl %} 443 ssl {% else %} 80 {% endif %};
   server_name {{ domains }};
 
+
   {% if use_ssl %}
   ssl_certificate   {{ ssl_cert }};
   ssl_certificate_key   {{ ssl_key }};
