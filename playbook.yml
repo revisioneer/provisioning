@@ -40,8 +40,6 @@
 
   roles:
     -
-      role: nicolai86.ansible-deployment-facts
-    -
       role: deploy
 
   tasks:
