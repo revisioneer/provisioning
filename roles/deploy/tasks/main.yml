@@ -51,13 +51,6 @@
     bare: "yes"
     update: "yes"
 
-- name: clone the bare Git repository to destination
-  git:
-    repo: "{{ deploy_to }}/scm"
-    dest: "{{ build_path }}"
-    version: "{{ branch }}"
-    bare: "no"
-
 - name: symlink shared files
   file:
     src: "{{ item.src }}"

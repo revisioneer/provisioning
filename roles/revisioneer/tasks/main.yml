@@ -111,6 +111,8 @@
     name: supervisor
     state: started
 
+- shell: "supervisorctl reread && supervisorctl update"
+
 - name: allow sudo access to supervisorctl
   lineinfile:
     dest: "/etc/sudoers"

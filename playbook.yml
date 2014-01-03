@@ -42,6 +42,11 @@
     -
       role: deploy
 
-  tasks:
-    - name: restart revisioneer
-      shell: sudo supervisorctl restart revisions
+    -
+      role: restart
+
+    -
+      role: nicolai86.ansible-revisioneer
+
+      repository_path: "{{ deploy_to }}/scm"
+      revisioneer_token: "{{ revisioneer_api_token }}"

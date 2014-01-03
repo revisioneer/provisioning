@@ -1,0 +1,3 @@
+---
+- name: restart revisioneer
+  shell: sudo supervisorctl restart revisions

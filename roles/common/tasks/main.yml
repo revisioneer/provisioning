@@ -15,3 +15,7 @@
     - htop
     - git-core
     - libpq-dev
+    - cmake
+    - python-dev
+    - zlib1g-dev
+    - libssl-dev
