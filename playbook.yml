@@ -8,6 +8,10 @@
     -
       role: webserver
     -
+      role: nicolai86.sqitch
+    -
+      role: nicolai86.godeb
+    -
       role: revisioneer
 
 - hosts: revisioneer
@@ -16,31 +20,35 @@
   vars:
     home_directory: "/home/{{ user }}"
 
-    repo: "git@github.com:nicolai86/revisioneer.git"
-    branch: "master"
-
     deploy_to: "{{ home_directory }}"
-    build_path: "{{ deployment.build_path }}"
-    release_path: "{{ deploy_to }}/releases/{{ deployment.timestamp }}"
-    shared_path: "{{ deploy_to }}/shared"
-    current_path: "{{ deploy_to }}/current"
+    # build_path: "{{ deployment.build_path }}"
+    # release_path: "{{ deploy_to }}/releases/{{ deployment.timestamp }}"
+    # shared_path: "{{ deploy_to }}/shared"
+    # current_path: "{{ deploy_to }}/current"
 
     directories:
       - "{{ deploy_to }}/releases"
       - "{{ shared_path }}/log"
       - "{{ shared_path }}/tmp"
-      - "{{ shared_path }}/vendor"
 
     templates:
       - { src: "templates/sqitch.conf.js", dest: "{{ shared_path }}/sqitch.conf" }
 
     symlinks:
       - { src: "{{ shared_path }}/sqitch.conf", dest: "{{ build_path }}/sqitch.conf" }
-      - { src: "{{ shared_path }}/vendor", dest: "{{ build_path }}/vendor" }
 
   roles:
     -
+      role: nicolai86.prepare-release
+
+      repo: "git@github.com:nicolai86/revisioneer.git"
+      branch: "master"
+
+    -
       role: deploy
+
+    -
+      role: nicolai86.finalize-release
 
     -
       role: restart

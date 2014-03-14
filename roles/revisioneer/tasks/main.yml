@@ -26,27 +26,6 @@
     shell: "/bin/bash"
     state: present
 
-# golang installation using godeb utility
-- name: download godeb
-  sudo_user: "{{ user }}"
-  get_url:
-    url: "https://godeb.s3.amazonaws.com/godeb-amd64.tar.gz"
-    dest: "{{ home_directory }}/godeb.tar.gz"
-  register: godeb_download
-
-- name: unzip godeb
-  sudo_user: "{{ user }}"
-  shell: "tar -C {{ home_directory }} -zxvf {{ home_directory }}/godeb.tar.gz"
-  when: "godeb_download.changed"
-
-- name: check if go was installed
-  shell: executable=/bin/bash which go; true
-  register: "go_is_installed"
-
-- name: install golang 1.2
-  shell: "{{ home_directory }}/godeb install"
-  when: "go_is_installed is defined and go_is_installed.stdout == ''"
-
 # ssh authorized key
 - authorized_key:
     user: "{{ user }}"
@@ -58,42 +37,6 @@
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0700
-
-# sqitch installation
-- name: install perl
-  apt: pkg={{ item }} state=installed update-cache=yes
-  with_items:
-    - perl
-    - curl
-    - cpanminus
-    - gettext
-
-- name: install Dist::Zilla
-  cpanm: name="{{ item }}"
-  with_items:
-    - Dist::Zilla
-    - Dist::Zilla::Plugin::CheckExtraTests
-    - Dist::Zilla::Plugin::LocaleTextDomain
-    - Dist::Zilla::Plugin::VersionFromModule
-    - DBD::Pg
-
-- file: path=/usr/local/perl owner=root group=root mode=655 recurse=yes state=directory
-
-- get_url:
-    url: "https://github.com/theory/sqitch/archive/v0.983.zip"
-    dest: "/usr/local/perl/sqitch.zip"
-  register: download_sqitch
-
-- stat:
-    path: /usr/local/perl/sqitch-0.983
-  register: sqitch_extract_dir
-
-- shell: "unzip /usr/local/perl/sqitch.zip -d /usr/local/perl"
-  when: sqitch_extract_dir.stat.isdir is undefined or sqitch_extract_dir.stat.isdir == false
-  register: sqitch_unzip
-
-- shell: "cd /usr/local/perl/sqitch-* && dzil install"
-  when: sqitch_unzip.changed
 
 # supervisor
 - apt: pkg={{ item }} state=installed
@@ -123,3 +66,13 @@
 
 - name: ensure proper sudo permissions
   shell: "chmod 4755 $(which sudo)"
+
+# install gpm
+- git:
+    repo: https://github.com/pote/gpm.git
+    dest: /tmp/gpm
+    version: v1.0.1
+  tags: test
+
+- shell: chdir=/tmp/gpm ./configure && make install
+  tags: test
