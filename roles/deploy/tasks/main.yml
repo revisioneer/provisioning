@@ -1,4 +1,13 @@
 ---
+- name: "list go dependencies"
+  shell: chdir="{{ build_path }}" {{ item }}
+  with_items:
+    - go list -f '{{join .Deps "\n"}}' > deps.list
+    - go list std > std.list
+    - grep -Fvx -f std.list deps.list > {{ build_path }}/Godeps
+    - rm std.list
+    - rm deps.list
+
 - name: install dependencies
   shell: "cd {{ build_path }} && gpm install"
 
