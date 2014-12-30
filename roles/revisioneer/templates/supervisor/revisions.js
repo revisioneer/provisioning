@@ -1,4 +1,4 @@
-[program:revisions]
+[program:revisioneer]
 command={{ home_directory }}/current/revisioneer
 autostart=true
 autorestart=true

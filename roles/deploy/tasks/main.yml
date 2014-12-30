@@ -1,20 +1,10 @@
 ---
-- name: "list go dependencies"
-  shell: chdir="{{ build_path }}" {{ item }}
-  with_items:
-    - go list -f '{{join .Deps "\n"}}' > deps.list
-    - go list std > std.list
-    - grep -Fvx -f std.list deps.list > {{ build_path }}/Godeps
-    - rm std.list
-    - rm deps.list
-
 - name: install dependencies
   shell: "cd {{ build_path }} && gpm install"
+  environment:
+    GOPATH: "{{ home_directory }}/go"
 
 - name: build binary
   shell: "cd {{ build_path }} && go build -o revisioneer"
-
-- name: migrate database
-  shell: "cd {{ build_path }} && sqitch deploy"
-  register: sqitch_result
-  failed_when: "'FATAL' in sqitch_result.stderr"
+  environment:
+    GOPATH: "{{ home_directory }}/go"

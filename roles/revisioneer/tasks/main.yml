@@ -45,7 +45,7 @@
 
 - template:
     src: supervisor/revisions.js
-    dest: /etc/supervisor/conf.d/revisions.conf
+    dest: /etc/supervisor/conf.d/revisioneer.conf
     owner: root
     group: root
     mode: 0600
@@ -54,15 +54,11 @@
     name: supervisor
     state: started
 
-- shell: "supervisorctl reread && supervisorctl update"
-
-- name: allow sudo access to supervisorctl
-  lineinfile:
-    dest: "/etc/sudoers"
-    insertafter: EOF
-    regexp: "^{{ user }}"
-    line: "{{ user }} ALL=NOPASSWD: /usr/bin/supervisorctl"
+- lineinfile:
+    dest: /etc/sudoers
     state: present
+    regexp: '^{{ user }}'
+    line: '{{ user }} ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl'
 
 - name: ensure proper sudo permissions
   shell: "chmod 4755 $(which sudo)"
@@ -72,7 +68,5 @@
     repo: https://github.com/pote/gpm.git
     dest: /tmp/gpm
     version: v1.0.1
-  tags: test
 
 - shell: chdir=/tmp/gpm ./configure && make install
-  tags: test

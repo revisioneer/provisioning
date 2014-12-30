@@ -8,11 +8,9 @@
     -
       role: webserver
     -
-      role: nicolai86.sqitch
+      role: revisioneer
     -
       role: nicolai86.godeb
-    -
-      role: revisioneer
 
 - hosts: revisioneer
   remote_user: "{{ user }}"
@@ -30,12 +28,6 @@
       - "{{ deploy_to }}/releases"
       - "{{ shared_path }}/log"
       - "{{ shared_path }}/tmp"
-
-    templates:
-      - { src: "templates/sqitch.conf.js", dest: "{{ shared_path }}/sqitch.conf" }
-
-    symlinks:
-      - { src: "{{ shared_path }}/sqitch.conf", dest: "{{ build_path }}/sqitch.conf" }
 
   roles:
     -
