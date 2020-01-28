@@ -1,3 +1,7 @@
+**deprecated**
+
+Do not use this to provision revisioneer. Instead run revisioneer as a container inside an orestrator and use terraform/ ansible/ cloudformation etc. to manage a database.
+
 # revisions-provisioning
 
 ansible provisioning for [revisioneer][1]
